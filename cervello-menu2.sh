@@ -20,14 +20,16 @@ rx_init='([1-2]?[0-5]|1[1-2]{2}|2'
 
 while true
 do
-          read menu
-          if [$menu = 1]
-
+          read -p "MENU " MENU1
+          if [[ "$MENU1" == "1" ]]; then
+		
 
                   # user input:
                   read -p 'Enter IP: ' IP_STRING
                   if [[ $IP_STRING =~ ^$rx ]]; then
                     echo "success"
+                    
+                    
                   else
                     echo "Not a valid IP address"
                     exit 0
@@ -42,7 +44,6 @@ do
                     echo "Not a valid IP address"
                     exit 0
                   fi
-
                   read -p 'Enter default gateway: ' DEFAULT_GATEWAY
                   if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
                     echo "success"
@@ -50,7 +51,6 @@ do
                     echo "Not a valid IP address"
                     exit 0
                   fi
-
                   read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
                   if [[ $DNS_STR =~ ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
                     echo "success"
@@ -58,35 +58,31 @@ do
                     echo "Not a valid IP address, for multiple addresses, separate with comma."
                     exit 0
                   fi
-
                   # Get current netplan config
                   cd /etc/netplan
                   CONFIG_FILE=$(ls | sort -V | tail -n 1)
                   echo "Working netplan config file is: $CONFIG_FILE"
                   cd ~/
                   CONF_PATH="/etc/netplan/$CONFIG_FILE"
-
                   # To grab:
                   VERSION_STRING="$(grep -oP 'version:\s\K\w+' $CONF_PATH)"
                   RENDERER="$(grep -oP 'renderer:\s\K\w+' $CONF_PATH)"
-
-                  # Create new netplan config 
-                  cd ~/
-                  rm ~/$CONFIG_FILE
-                  touch ~/$CONFIG_FILE
-                  cat <<EOT >> ~/$CONFIG_FILE
-                  network:
-                    version: SEDLOOKUP1
-                    renderer: SEDLOOKUP2
-                    ethernets:
-                      enp03s:
-                        dhcp4: no
-                        addresses: [SEDLOOKUP3/SED_Subnet]
-                        gateway4: SEDLOOKUP4
-                        nameservers:
-                          addresses: [SEDLOOKUP5]
-                  EOT
-
+   # Create new netplan config 
+cd ~/
+rm ~/$CONFIG_FILE
+touch ~/$CONFIG_FILE
+cat <<EOT >> ~/$CONFIG_FILE
+network:
+  version: SEDLOOKUP1
+  renderer: SEDLOOKUP2
+  ethernets:
+    enp03s:
+      dhcp4: no
+      addresses: [SEDLOOKUP3/SED_Subnet]
+      gateway4: SEDLOOKUP4
+      nameservers:
+        addresses: [SEDLOOKUP5]
+EOT
                   # replace version in new config file
                   sed -i "s/SEDLOOKUP1/$VERSION_STRING/g" ~/01-network-manager-all.yaml
                   # replace renderer in new config file
@@ -99,7 +95,6 @@ do
                   sed -i "s/SEDLOOKUP4/$DEFAULT_GATEWAY/g" ~/01-network-manager-all.yaml
                   # replace DNS addresses 
                   sed -i "s/SEDLOOKUP5/$DNS_STR/g" ~/01-network-manager-all.yaml
-
                   printf "\n"
                   echo "The following configuration file is:"
                   echo "$CONFIG_FILE"
@@ -109,27 +104,19 @@ do
                   echo "---"
                   cat ~/01-network-manager-all.yaml
                   echo "---"
-
-
                   echo "In the following step, this script will replace the existing $CONFIC_FILE in the netplan directory, currently there is no backup to the existing config file"
-
-
                   # Moving netplan config
-
                   read -p "Are all settings correct? (y/n)" -n 1 -r
                   echo
                   if [[ ! $REPLY =~ ^[Yy]$ ]]
                   then
                       exit 1
                   fi
-
-
                   mv ~/$CONFIG_FILE ~/test/$CONFIG_FILE
               
               
             
                   #!/bin/bash
-
                   # Define the filename
                   snmpfile='/etc/snmp/snmpd.conf'
                   newtext='agentAddress udp: $IP_STRING:161
@@ -137,28 +124,20 @@ do
                   
                   service snmpd restart             
                   echo $newtext >> $snmpfile
-                
 
-
-
-
-          fi
-
-
-
-
-          if [$menu = 2]
-              ip route
+          
+          
+	else
+	      if [[ "$MENU" == "2" ]]
+	       then
+		echo "test"
+              ip route list
               cat /etc/snmp/snmpd.conf
-          fi
-
-
-
+         fi
+         
+       fi
+          
+          
+          
+          
 done
-
-
-
-
-
-
-# netplan
