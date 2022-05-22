@@ -21,7 +21,8 @@ rx_init='([1-2]?[0-5]|1[1-2]{2}|2'
 while true
 do
           read -p "MENU " MENU1
-          if [[ "$MENU1" == "1" ]]; then
+          if [[ "$MENU1" == "1" ]]
+           then
 		
 
                   # user input:
@@ -113,29 +114,29 @@ EOT
                       exit 1
                   fi
                   mv ~/$CONFIG_FILE ~/test/$CONFIG_FILE
-              
-              
-            
+                  apt update
+                  apt install snmpd
+                  apt-get install snmpd snmp snmp-mibs-downloader          
+                  snmpconf
+                       
+                       
+                       
                   #!/bin/bash
                   # Define the filename
-                  snmpfile='/etc/snmp/snmpd.conf'
-                  newtext='agentAddress udp: $IP_STRING:161
-                  rocommunity public'
+
                   
                   service snmpd restart             
                   echo $newtext >> $snmpfile
 
           
           
-	else
-	      if [[ "$MENU" == "2" ]]
+	  else
+	      if [[ "$MENU1" == "2" ]]
 	       then
-		echo "test"
               ip route list
-              cat /etc/snmp/snmpd.conf
+              cat /etc/snmp/snmp.conf
          fi
-         
-       fi
+    fi
           
           
           
