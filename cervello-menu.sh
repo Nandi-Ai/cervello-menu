@@ -203,9 +203,8 @@ EOT
 
           if [[ "$DisplayMenu" == "2" ]]
           then
-              cat /etc/snmp/snmp.conf
-              echo -e "\n"
-              cat /etc/snmp/snmpd.conf
+                grep -v '^#' /etc/snmp/snmpd.conf | grep .
+                grep -v '^#' /etc/snmp/snmp.conf | grep .
           fi
         fi 
     
