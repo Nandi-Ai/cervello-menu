@@ -24,8 +24,8 @@ magenta='\033[0;35m'
 cyan='\033[0;36m'
 
 
-
-
+IP_STRING=$(cut -d "/" -f1 <<< $(ip addr show | grep -v 'packets\|errors\|forever\|valid\|link\|::\|lo:\|host\|NO\|:' | awk '{print $2}')
+SUB=$(cut -d "/" -f2 <<< $(ip addr show | grep -v 'packets\|errors\|forever\|valid\|link\|::\|lo:\|host\|NO\|:' | awk '{print $2}')
 echo "Cervello Configurator"
 
 while true
@@ -41,7 +41,7 @@ do
               echo "2. Configure SNMP"
               echo "3. Configure IP Route"
               echo "4. Configure DNS"
-
+              
               read -p "Menu:  " ConfigMenu
                 if [[ "$ConfigMenu" == "1" ]]
                     then
@@ -81,6 +81,20 @@ do
                         if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
                             echo "success"
                             read -p "$DEFAULT_GATEWAY are you sure? (y =yes)"  CHECK
+                            if [[ "$CHECK" == "y" ]]; then
+                            break
+                            fi
+                        else
+                          echo "Not a valid IP address"
+                        fi
+                    done
+
+                 while true
+                  do
+                        read -p 'Enter network address: ' NET_STR
+                        if [[ $NET_STR =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
+                            echo "success"
+                            read -p "$NET_STR are you sure? (y =yes)"  CHECK
                             if [[ "$CHECK" == "y" ]]; then
                             break
                             fi
@@ -132,6 +146,9 @@ network:
       gateway4: SEDLOOKUP4
       nameservers:
         addresses: [SEDLOOKUP5]
+      routes:
+      - to: [SEDLOOKUP6/SED_Subnet]
+        via: SEDLOOKUP4
 EOT
                   # replace version in new config file
                   sed -i "s/SEDLOOKUP1/$VERSION_STRING/g" ~/01-network-manager-all.yaml
@@ -139,12 +156,18 @@ EOT
                   sed -i "s/SEDLOOKUP2/$RENDERER/g" ~/01-network-manager-all.yaml
                   # replace IP address in new config file
                   sed -i "s/SEDLOOKUP3/$IP_STRING/g" ~/01-network-manager-all.yaml
-                  # replace subnet in new config
-                  sed -i "s/SED_Subnet/$SUBNET_STRING/g" ~/01-network-manager-all.yaml
+                  # replace subnet in ne6w config
+                  sed -i "s/SED_Subnet/$SUB/g" ~/01-network-manager-all.yaml
                   # replace default gateway
                   sed -i "s/SEDLOOKUP4/$DEFAULT_GATEWAY/g" ~/01-network-manager-all.yaml
                   # replace DNS addresses 
                   sed -i "s/SEDLOOKUP5/$DNS_STR/g" ~/01-network-manager-all.yaml
+
+               
+               
+                  sed -i "s/SEDLOOKUP6/$SUB/g" ~/01-network-manager-all.yaml
+               
+               
                   printf "\n"
                   echo "The following configuration file is:"
                   echo "$CONFIG_FILE"
