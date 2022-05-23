@@ -16,15 +16,25 @@
 rx='(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
 rx_init='([1-2]?[0-5]|1[1-2]{2}|2'
 
-
+echo "Cervello Configurator"
 
 while true
 do
-          read -p "MENU " MENU1
-          if [[ "$MENU1" == "1" ]]
+          echo "1. Config Parameters"
+          echo "2. Display Parameters"
+          read -p "Menu:  " MainMenu
+          if [[ "$MainMenu" == "1" ]]
            then
-		
+		          echo "1. Config IP"
+              echo "2. Configure SNMP"
+              echo "3. Configure IP Route"
+              echo "4. Configure DNS"
 
+              read -p "Menu:  " ConfigMenu
+                    if [[ "$ConfigMenu" == "1" ]]
+                    then
+            
+            
                   # user input:
                   read -p 'Enter IP: ' IP_STRING
                   if [[ $IP_STRING =~ ^$rx ]]; then
@@ -35,9 +45,10 @@ do
                     echo "Not a valid IP address"
                     exit 0
                   fi
-
+                
                   ########################
-
+                 if [[ "$ConfigMenu" == "3" ]]
+                  then
                   read -p 'Enter subnet: ' SUBNET_STRING
                   if [[ $SUBNET_STRING =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
                     echo "success"
@@ -45,14 +56,18 @@ do
                     echo "Not a valid IP address"
                     exit 0
                   fi
+
+                  
                   read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
-                  read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
-                  if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
-                    echo "success"
+                  if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
+                      echo "success"
                   else
                     echo "Not a valid IP address"
                     exit 0
                   fi
+                fi
+                if [[ "$ConfigMenu" == "4" ]]
+                  then
                   read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
                   if [[ $DNS_STR =~ ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
                     echo "success"
@@ -60,6 +75,12 @@ do
                     echo "Not a valid IP address, for multiple addresses, separate with comma."
                     exit 0
                   fi
+
+                fi
+      
+      
+            
+      
                   # Get current netplan config
                   cd /etc/netplan
                   CONFIG_FILE=$(ls | sort -V | tail -n 1)
@@ -114,6 +135,9 @@ EOT
                   then
                       exit 1
                   fi
+                
+                if [[ "$ConfigMenu" == "2" ]]
+                then
                   mv ~/$CONFIG_FILE ~/test/$CONFIG_FILE
                   apt update
                   apt install snmpd
@@ -124,34 +148,48 @@ EOT
                        
                   #!/bin/bash
                   # Define the filename
-                  search = "rocommunity  public"
-                  swap 
                   echo -e "\n"
                   read -p "enter Community name " COMU
-                  swap = "rocommunity  $COMU"
-                  sed -i "s/$search/$swap/" /etc/snmp/snmp.conf
+                  sed -i "s/public/$COMU/" /etc/snmp/snmp.conf
                   service snmpd restart   
                   echo -e "\n"
 
-                  read -p "SNMP V3? (y = yes) " MENU2
-                    if [[ "$MENU2" == "y" ]]
+                  read -p "SNMP V3? (y = yes) " SNMPMenu
+                    if [[ "$SNMPMenu" == "y" ]]
                       then
                          apt-get -y install snmp snmpd libsnmp-dev
                          net-snmp-config --create-snmpv3-user -ro
                     fi  
-          
+          fi
           
 	  else
-	      if [[ "$MENU1" == "2" ]]
+	      if [[ "$MainMenu" == "2" ]]
 	       then
-              ip route list
+         		  echo "1. Display IP"
+              echo "2. Display SNMP"
+              echo "3. Display IP Route"
+              
+              read -p "Menu: " DisplayMenu
+	        
+          if [[ "$DisplayMenu" == "1" ]]
+          then
+              apt-get install net-tools
+              ifconfig | grep -i mask
+          fi
+
+`         if [[ "$DisplayMenu" == "3" ]]
+          then 
+             netstat -nr 
+          fi
+
+          if [[ "$DisplayMenu" == "2" ]]
+          then
               cat /etc/snmp/snmp.conf
               echo -e "\n"
               cat /etc/snmp/snmpd.conf
-         fi
+          fi
+        fi 
+    
     fi
-          
-          
-          
-          
+         
 done
