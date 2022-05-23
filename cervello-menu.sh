@@ -45,7 +45,8 @@ do
                     echo "Not a valid IP address"
                     exit 0
                   fi
-                  read -p 'Enter default gateway: ' DEFAULT_GATEWAY
+                  read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
+                  read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
                   if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
                     echo "success"
                   else
@@ -123,11 +124,21 @@ EOT
                        
                   #!/bin/bash
                   # Define the filename
+                  search = "rocommunity  public"
+                  swap 
+                  echo -e "\n"
+                  read -p "enter Community name " COMU
+                  swap = "rocommunity  $COMU"
+                  sed -i "s/$search/$swap/" /etc/snmp/snmp.conf
+                  service snmpd restart   
+                  echo -e "\n"
 
-                  
-                  service snmpd restart             
-                  echo $newtext >> $snmpfile
-
+                  read -p "SNMP V3? (y = yes) " MENU2
+                    if [[ "$MENU2" == "y" ]]
+                      then
+                         apt-get -y install snmp snmpd libsnmp-dev
+                         net-snmp-config --create-snmpv3-user -ro
+                    fi  
           
           
 	  else
@@ -135,6 +146,8 @@ EOT
 	       then
               ip route list
               cat /etc/snmp/snmp.conf
+              echo -e "\n"
+              cat /etc/snmp/snmpd.conf
          fi
     fi
           
