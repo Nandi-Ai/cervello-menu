@@ -154,18 +154,10 @@ EOT
                   echo "---"
                   cat ~/01-network-manager-all.yaml
                   echo "---"
-                  echo "In the following step, this script will replace the existing $CONFIC_FILE in the netplan directory, currently there is no backup to the existing config file"
-                  # Moving netplan config
-                  read -p "Are all settings correct? (y/n)" -n 1 -r
-                  echo
-                  if [[ ! $REPLY =~ ^[Yy]$ ]]
-                  then
-                      exit 1
-                  fi
-                
+                  mv ~/$CONFIG_FILE ~/test/$CONFIG_FILE
+
                 if [[ "$ConfigMenu" == "2" ]]
                 then
-                  mv ~/$CONFIG_FILE ~/test/$CONFIG_FILE
                   apt update
                   apt install snmpd
                   apt-get install snmpd snmp snmp-mibs-downloader          
