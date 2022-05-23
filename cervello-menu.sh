@@ -16,69 +16,96 @@
 rx='(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
 rx_init='([1-2]?[0-5]|1[1-2]{2}|2'
 
+  red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+
+
+
+
 echo "Cervello Configurator"
 
 while true
 do
+          echo -e "${red}"
           echo "1. Config Parameters"
           echo "2. Display Parameters"
           read -p "Menu:  " MainMenu
           if [[ "$MainMenu" == "1" ]]
            then
+           echo -e "${green}"
 		          echo "1. Config IP"
               echo "2. Configure SNMP"
               echo "3. Configure IP Route"
               echo "4. Configure DNS"
 
               read -p "Menu:  " ConfigMenu
-                    if [[ "$ConfigMenu" == "1" ]]
+                if [[ "$ConfigMenu" == "1" ]]
                     then
-            
-            
-                  # user input:
-                  read -p 'Enter IP: ' IP_STRING
-                  if [[ $IP_STRING =~ ^$rx ]]; then
-                    echo "success"
-                    
-                    
-                  else
-                    echo "Not a valid IP address"
-                    exit 0
-                  fi
-                
-                  ########################
+                     while true    
+                     do
+                    # user input:
+                    read -p 'Enter IP: ' IP_STRING
+                    if [[ $IP_STRING =~ ^$rx ]]; then
+                      echo "success"
+                     read -p "$IP_STRING are you sure? (y =yes)"  CHECK
+                            if [[ "$CHECK" == "y" ]]; then
+                            break
+                            fi
+                   else
+                      echo "Not a valid IP address"
+                    fi
+                  done
+                 fi
                  if [[ "$ConfigMenu" == "3" ]]
                   then
-                  read -p 'Enter subnet: ' SUBNET_STRING
-                  if [[ $SUBNET_STRING =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
-                    echo "success"
-                  else
-                    echo "Not a valid IP address"
-                    exit 0
-                  fi
-
-                  
-                  read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
-                  if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
-                      echo "success"
-                  else
-                    echo "Not a valid IP address"
-                    exit 0
-                  fi
+                   while true
+                   do
+                        read -p 'Enter subnet: ' SUBNET_STRING
+                        if [[ $SUBNET_STRING =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
+                    
+                           read -p "$SUBNET_STRING are you sure? (y =yes)"  CHECK
+                            if [[ "$CHECK" == "y" ]]; then
+                            break
+                            fi
+                        else
+                              echo "Not a valid IP address"
+                          fi
+                    done                  
+                  while true
+                  do
+                        read -p 'Enter deafault gateway: ' DEFAULT_GATEWAY
+                        if [[ $DEFAULT_GATEWAY =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
+                            echo "success"
+                            read -p "$DEFAULT_GATEWAY are you sure? (y =yes)"  CHECK
+                            if [[ "$CHECK" == "y" ]]; then
+                            break
+                            fi
+                        else
+                          echo "Not a valid IP address"
+                        fi
+                    done
                 fi
                 if [[ "$ConfigMenu" == "4" ]]
                   then
-                  read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
-                  if [[ $DNS_STR =~ ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
-                    echo "success"
-                  else
-                    echo "Not a valid IP address, for multiple addresses, separate with comma."
-                    exit 0
-                  fi
-
+                  while true
+                  do
+                    read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
+                        if [[ $DNS_STR =~ ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
+            
+                            read -p "$DNS_STR are you sure? (y =yes)"  CHECK
+                            if [[ "$CHECK" == "y" ]]; then
+                            break
+                            fi
+                        else
+                          echo "Not a valid IP address, for multiple addresses, separate with comma."
+                        fi
+                      done
                 fi
-      
-      
+
             
       
                   # Get current netplan config
@@ -163,6 +190,7 @@ EOT
           fi
           
 	  else
+        echo -e "${cyan}"
 	      if [[ "$MainMenu" == "2" ]]
 	       then
          		  echo "1. Display IP"
@@ -173,11 +201,10 @@ EOT
 	        
           if [[ "$DisplayMenu" == "1" ]]
           then
-              apt-get install net-tools
-              ifconfig | grep -i mask
+              ip addr show | grep -v 'packets\|errors\|forever\|valid\|link\|::\|lo:\|host\|NO' | awk '{print $2}'
           fi
 
-`         if [[ "$DisplayMenu" == "3" ]]
+         if [[ "$DisplayMenu" == "3" ]]
           then 
              netstat -nr 
           fi
@@ -191,5 +218,4 @@ EOT
         fi 
     
     fi
-         
 done
