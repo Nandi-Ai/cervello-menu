@@ -1,0 +1,13 @@
+
+network:
+  version: 2
+  renderer: networkd 
+  ethernets:
+    {{ linkname }}
+      {{ dhcp4 }}
+      addresses: [{{ ip }}/{{ subnet }}]
+      gateway4: {{ gateway4 }}
+      {{ nameservers }}
+      {{ routes }}
+      
+      
