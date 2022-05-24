@@ -4,9 +4,13 @@ network:
   renderer: networkd 
   ethernets:
     {{ linkname }}
+	{%- if dhcp %}
       {{ dhcp4 }}
+		dhcp4: yes
+	{% else %}
       addresses: [{{ ip }}/{{ subnet }}]
       gateway4: {{ gateway4 }}
+	{% endif %}
       {{ nameservers }}
       {{ routes }}
       
