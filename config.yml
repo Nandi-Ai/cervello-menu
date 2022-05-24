@@ -1,0 +1,18 @@
+network:
+  version: 2
+  renderer: networkd 
+  ethernets:
+    Vlan177:
+      addresses: [10.77.1.68/255.255.255.0]
+      gateway4: 10.8.9.9
+      nameservers:
+        addresses: [9.8.7.6]
+      
+    Management1:
+      addresses: [10.77.1.68/255.255.255.0]
+      gateway4: 10.8.9.9
+      nameservers:
+        addresses: [9.8.7.6]
+      
+
+      

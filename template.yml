@@ -1,16 +1,24 @@
-
 network:
   version: 2
   renderer: networkd 
   ethernets:
-    {{ linkname }}
-      {%- if dhcp %}
+    {%- for interface in interfaces %}
+    {{ interface.name }}:
+      {%- if interface.dhcp %}
       dhcp4: yes
       {% else %}
-      addresses: [{{ ip }}/{{ subnet }}]
-      gateway4: {{ gateway4 }}
+      addresses: [{{ interface.ip }}/{{ interface.subnet }}]
+      gateway4: {{ interface.gateway }}
+      nameservers:
+        addresses: [{{ interface.nameserver }}]
+      {%- if route_enabled %}
+      routes:
+        {%- for route in routes %}
+        - to: {{route.net}}
+          via: {{route.gw}}
+        {%- endfor %}
       {% endif %}
-      {{ nameservers }}
-      {{ routes }}
-      
+      {% endif %}
+    {%- endfor %}
+
       

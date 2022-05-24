@@ -1,47 +1,41 @@
-    #!/usr/bin/env python
+#!/usr/bin/env python
 from ast import expr_context
 import sys
+import yaml
 from jinja2 import Template
-if sys.argv[1] == "-dhcp" and sys.argv[2] == "false":
-    with open("template.yml", "r") as file:
-        fstr = file.read()
-    try:
-        tm = Template(fstr)
-        with open("linkname.txt", "r") as file:
-            linkname = file.read()
-    except:
-        linkname = ""
-    dhcp4 = "dhcp: false"
-    try:
-        with open("ip.txt", "r") as file:
-            ip = file.read()
-    except:
-        ip=""
-    try:
-        with open("dns.txt", "r") as file:
-            dns = file.read()
-    except:
-        dns=""
-    nameservers = "nameservers: \n        addresses: " + dns
-    try:
-        with open("gateway4.txt", "r") as file:
-           gateway4 = file.read()
-    except:
-        gateway = ""
-    try:
-        with open("subnet.txt", "r") as file:
-            subnet = file.read()
-    except:
-        subnet = ""
-    try:
-        with open("to.txt", "r") as file:
-            to = file.read()
-    except:
-        to=""
-    via = ""
-    routes = "routes: \n      - to: " + to + subnet + "\n        via: " + gateway4
-    msg = tm.render(subnet=subnet, linkname=linkname, dhcp4=dhcp4, ip=ip, gateway4=gateway4, dns=dns, routes=routes)
-    text_file = open("config.yml", "w")
-    n = text_file.write(msg)
-    text_file.close()
-    print(msg)
+import argparse
+
+parser = argparse.ArgumentParser(description="This script configures networking.")
+
+parser.add_argument('-v', '--validate', required=False, default=False,
+                    help="Validate connectivity with the interafeces")
+parser.add_argument('-d', '--dhcp',  required=False, default=False, action='store_true',
+                    help="Configuration DHCP for networking and machine setup")
+parser.add_argument('-g', '--gateway', required=False, default="10.10.10.10",
+                    help="This is to execute 'create machine' function to Conductor.")
+
+parser.add_argument('-nr', '--noreboot', required=False, default=False, help="This is will disable reboot.")
+args = parser.parse_args()
+
+dhcp = args.dhcp
+gateway4 = args.gateway
+
+with open("template.yml", "r") as file:
+    netPlanTemplate = file.read()
+    netplan = Template(netPlanTemplate)
+
+with open("interfaces.yaml", "r") as f:
+    data = yaml.load(f, Loader=yaml.SafeLoader)
+
+with open("routes.yaml", "r") as f:
+    routes = yaml.load(f, Loader=yaml.SafeLoader)
+
+msg = netplan.render(routes)
+
+
+text_file = open("config.yml", "w")
+n = text_file.write(msg)
+text_file.close()
+print(msg)
+
+    
