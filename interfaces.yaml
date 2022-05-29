@@ -23,3 +23,5 @@ interfaces:
     ip: 2.3.0.0
 
   - name: eno1
+    ip: 2.2.2.2
+    ip: 23.4.2.1

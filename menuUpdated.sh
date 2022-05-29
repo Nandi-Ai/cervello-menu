@@ -1,10 +1,21 @@
 #! /usr/bin/env bash
-# IP config menu script
+# Config menu script
 
 selectedIf="eth0"
 
-AskForSubnetMask ()
+validIP () {
+	rx='(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
+        if [[ $1 =~ ^$rx ]]; then
+                 echo "Valid IP"
+		 return 0
+	else
+		echo "Invalid IP"
+		return 1
+	fi
+}
 
+
+AskForSubnetMask ()
 {
     while true
                    do
@@ -32,7 +43,7 @@ configureIP ()
                do
                          # user input:
                     read -p 'Enter IP: ' IP_STRING
-                    if [[ $IP_STRING =~ ^$rx ]]; then
+                    if validIP $IP_STRING ; then
                          echo "success"
                          read -p "$IP_STRING are you sure? (y = yes)"  CHECK
                          if [[ "$CHECK" == "y" ]]; then
@@ -174,7 +185,8 @@ selectInterface() {
 	select interface in ${countInterfaces[@]}
 	do  
      		echo "Selected interface: $interface"
-     		interfaceName=$interface
+     		selectedIf=$interface
+		return $selectedIf
      		break 
 	done
 }
@@ -213,7 +225,7 @@ displayMenu()
 rx='(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
 rx_init='([1-2]?[0-5]|1[1-2]{2}|2'
 
-  red='\033[0;31m'
+red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
 blue='\033[0;34m'
