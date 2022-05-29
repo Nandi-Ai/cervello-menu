@@ -53,14 +53,13 @@ IP_STRING=$(cut -d "/" -f1 <<< $(ip addr show | grep -v 'forever\|valid\|link\|:
 CIDR=$(cut -d "/" -f2 <<< $(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|:' | awk '{print $2}'))
 echo "Cervello Configurator"
 
-countInterfaces=$(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|/' | awk '{print $2}' | sed -n '$=')
-echo "Which interface do u want to config?"
-for (( c=1; c<=$countInterfaces; c++ ))
+# countInterfaces=$(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|/' | awk '{print $2}' | sed -n '$=')
+countInterfaces=$(nmcli device status | awk '/ethernet/{print $1}')
+PS3="Which interface do u want to config?"
+select interface in ${countInterfaces[@]}
 do  
-     interfaceName=$(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|/' | awk '{print $2}' | sed -n "${c}p")
-     echo "$c . $interfaceName"
+     echo "Selected number: $interface"
 done
-read -p "Menu: " interfaceMenu
 interfaceName=$(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|/' | awk '{print $2}' | sed -n "${interfaceMenu}p")
 ########################
 echo -e "\n  - name: $interfaceName" >> interfaces.yaml

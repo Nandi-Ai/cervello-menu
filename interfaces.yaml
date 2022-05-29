@@ -10,3 +10,5 @@ interfaces:
     subnet: "255.255.255.0"
     gateway: "10.8.9.9"
     nameserver: "9.8.7.6"
+
+  - name: 
