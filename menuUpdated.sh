@@ -248,7 +248,7 @@ do
               configMenu
           ;;
           "Display Parameters")   
-   
+               displayMenu
           ;;       
         "Quit")
             break
