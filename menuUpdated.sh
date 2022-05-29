@@ -145,6 +145,66 @@ selectDNS()
 }
 
 
+
+# submenu
+configMenu () {
+  local PS3='Please enter sub option: '
+  options=("Config IP" "Configure SNMP" "Configure IP Route" "Configure DNS" "Configure Default Gateway" "Quit")
+               select opt in "${options[@]}"
+               do
+               case $opt in
+                    "Config IP")
+                         selectIP
+                         ;;
+                    "Configure SNMP")
+                         editSNMP
+                         ;;
+                    "Configure IP Route")
+                         selectNetwork
+                         selectGateway
+                         echo "  - gw: $DEFAULT_GATEWAY" >> routes.yaml
+                         ;;
+                    "Configure DNS")
+                         selectDNS
+                         ;;
+                    "Configure Default Gateway")
+                         selectGateway
+                         ;;
+                    "Quit")
+                         break
+                         ;;
+                    *) echo invalid option;;
+                    esac
+     done
+}
+displayMenu()
+{
+             local PS3='Please enter sub option: '
+            options=("Display IP" "Display SNMP" "Display IP Route" "Quit")
+               select opt in "${options[@]}"
+               do
+               case $opt in
+                    
+                    "Display IP")
+                         ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO' | awk '{print $2}'
+                         ;;
+                    "Display SNMP")
+                         grep -v '^#' /etc/snmp/snmpd.conf | grep .
+                         grep -v '^#' /etc/snmp/snmp.conf | grep .
+                         ;;
+                    "Display IP Route")
+                         netstat -nr 
+                         ;;
+                    "Quit")
+                         break
+                         ;;
+                    *) echo invalid option;;
+                    esac
+               done
+}
+
+
+
 #LINKNAME = $(ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO\|/' | awk '{print $2}')
 #echo "$LINKNAME">linkname.txt
 
@@ -185,55 +245,10 @@ select opt in "${options[@]}"
 do
     case $opt in
         "Config Parameters")
-               configMenu=("Config IP" "Configure SNMP" "Configure IP Route" "Configure DNS" "Configure Default Gateway" "Quit")
-               select opt2 in "${configMenu[@]}"
-               case $opt2 in
-                
-                    "Config IP")
-                         selectIP
-                         ;;
-                    "Configure SNMP")
-                         editSNMP
-                         ;;
-                    "Configure IP Route")
-                         selectNetwork
-                         selectGateway
-                         echo "  - gw: $DEFAULT_GATEWAY" >> routes.yaml
-                         ;;
-                    "Configure DNS")
-                         selectDNS
-                         ;;
-                    "Configure Default Gateway")
-                         selectGateway
-                         ;;
-                    "Quit")
-                         break
-                         ;;
-                    *) echo invalid option;;
-                    esac
-               done
+              configMenu
           ;;
           "Display Parameters")   
-               displayMenu=("Display IP" "Display SNMP" "Display IP Route" "Quit")
-               select opt3 in "${displayMenu[@]}"
-               case $opt3 in
-                
-                    "Display IP")
-                         ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO' | awk '{print $2}'
-                         ;;
-                    "Display SNMP")
-                         grep -v '^#' /etc/snmp/snmpd.conf | grep .
-                         grep -v '^#' /etc/snmp/snmp.conf | grep .
-                         ;;
-                    "Display IP Route")
-                         netstat -nr 
-                         ;;
-                    "Quit")
-                         break
-                         ;;
-                    *) echo invalid option;;
-                    esac
-               done
+   
           ;;       
         "Quit")
             break
