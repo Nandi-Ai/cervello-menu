@@ -27,10 +27,8 @@ with open("template.yml", "r") as file:
 with open("interfaces.yaml", "r") as f:
     data = yaml.load(f, Loader=yaml.SafeLoader)
 
-with open("routes.yaml", "r") as f:
-    routes = yaml.load(f, Loader=yaml.SafeLoader)
 
-msg = netplan.render(routes)
+msg = netplan.render(data)
 
 
 text_file = open("config.yml", "w")

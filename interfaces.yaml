@@ -5,7 +5,6 @@ interfaces:
     gateway: "10.8.9.9"
     nameserver: "9.8.7.6"
   - name: Management1
-    description: lab01 - Eth100/1/37
     enabled: true
     ip: "10.77.1.68"
     subnet: "255.255.255.0"

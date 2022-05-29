@@ -74,7 +74,7 @@ do
      if [[ "$MainMenu" == "1" ]]
      then
           echo -e "${green}"
-	     echo "1. Config IP"
+	  echo "1. Config IP"
           echo "2. Configure SNMP"
           echo "3. Configure IP Route"
           echo "4. Configure DNS"
