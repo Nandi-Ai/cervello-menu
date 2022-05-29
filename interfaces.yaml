@@ -12,3 +12,14 @@ interfaces:
     nameserver: "9.8.7.6"
 
   - name: 
+
+  - name: eno1
+
+  - name: eno1
+
+  - name: eno1
+
+  - name: eno1
+    ip: 2.3.0.0
+
+  - name: eno1
