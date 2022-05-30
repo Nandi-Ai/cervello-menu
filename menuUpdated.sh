@@ -3,6 +3,24 @@
 
 selectedIf="eth0"
 
+validSubnet()
+{
+
+     subNetSTR ="(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+     if [[  $1 > 0 && $1 < 33  ]]; then
+          echo "Valid Subnet Mask"
+	     return 0
+     else 
+          if [[ $1 =~ ^$subNetSTR ]]; then
+               echo "Valid Subnet Mask"
+	          return 0
+	     else
+		     echo "Invalid Subnet Mask/CIDR number should be between 1 and 32"
+		     return 1
+	     fi
+     fi
+
+}
 validIP () {
 	rx='(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$'
         if [[ $1 =~ ^$rx ]]; then
@@ -18,21 +36,22 @@ validIP () {
 AskForSubnetMask ()
 {
     while true
-                   do
-                        read -p 'Enter CIDR number for Subnet Mask (1-32): ' CIDR
-                          if [[ "$CIDR" > 0 && "$CIDR" < 33 ]]; then
-                              read -p "You chose $CIDR, Are you sure? (y = yes): " CHECK
-                             if [[ "$CHECK" == "y" ]]; then
-                                  break
-                             fi
-                          else
-                              echo "CIDR number should be between 1 and 32"
-                          fi
-                    done      
+     do
+                             # user input:
+                    read -p 'Enter Subnet/CIDR: ' Subnet_INPUT
+                    if validSubnet $Subnet_INPUT ; then
+                         read -p "$Subnet_INPUT are you sure? (y = yes)"  CHECK
+                         if [[ "$CHECK" == "y" ]]; then
+                              break
+                         fi
+                    else
+                         echo "Not a valid Subnet Mask"
+                    fi
+               done
                     
                     #echo "$CIDR"  > subnet.txt
                     #####################
-                    echo "    cidr: $CIDR" >> interfaces.yaml
+                    echo "    cidr: $Subnet_INPUT" >> interfaces.yaml
                     ####################
 }
 
@@ -44,7 +63,6 @@ configureIP ()
                          # user input:
                     read -p 'Enter IP: ' IP_STRING
                     if validIP $IP_STRING ; then
-                         echo "success"
                          read -p "$IP_STRING are you sure? (y = yes)"  CHECK
                          if [[ "$CHECK" == "y" ]]; then
                               break
@@ -60,23 +78,22 @@ configureIP ()
 configureGateway ()
 {
         while true    
-                    do
+     do
                          # user input:
-                              read -p 'Enter Default Gateway: ' DEFAULT_GATEWAY
-                              if [[ $DEFAULT_GATEWAY =~ ^$rx ]]; then
-                                   echo "success"
-                                   read -p "$DEFAULT_GATEWAY are you sure? (y = yes)"  CHECK
-                                   if [[ "$CHECK" == "y" ]]; then
-                                        break
-                                   fi
-                              else
-                                   echo "Not a valid IP address"
-                              fi
-     done
-                     #echo "$IP_STRING" > ip.txt
-                         ####################
-                         echo "    gateway: $DEFAULT_GATEWAY" >> interfaces.yaml
-                         ######################
+                    read -p 'Enter Gateway IP: ' DEFAULT_GATEWAY
+                    if validIP $DEFAULT_GATEWAY ; then
+                         read -p "$DEFAULT_GATEWAY are you sure? (y = yes)"  CHECK
+                         if [[ "$CHECK" == "y" ]]; then
+                              break
+                         fi
+                    else
+                         echo "Not a valid IP address"
+                    fi
+          done
+         #echo "$IP_STRING" > ip.txt
+        ####################
+         echo "    gateway: $DEFAULT_GATEWAY" >> interfaces.yaml
+         ######################
      
 
 }
@@ -85,21 +102,19 @@ configureNetwork()
 {
 
 
-            while true
-                         do
-                              read -p 'Enter network address: ' NET_STR
-                              if [[ $NET_STR =~ ^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then 
-                                   echo "success"
-                                   read -p "You chose $NET_STR, Are you sure? (y =yes)"  CHECK
-                                   if [[ "$CHECK" == "y" ]]; then
-                                        break
-                                   fi
-                              else
-                                   echo "Not a valid IP address"
-                              fi
-                         done
-                         #echo "$to" > to.txt
-                         echo "    net: $NET_STR" >> routes.yml
+     while true
+     do
+          read -p 'Enter network address: ' NET_STR
+          if validIP $NET_STR ; then
+               read -p "You chose $NET_STR, Are you sure? (y =yes)"  CHECK
+               if [[ "$CHECK" == "y" ]]; then
+                    break
+               fi
+          else
+               echo "Not a valid IP address"
+          fi
+     done
+     echo "    net: $NET_STR" >> routes.yml
 }
 
 
@@ -130,53 +145,61 @@ editSNMP()
 configureDNS()
 {
      while true
-                         do
-                              read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
-                              if [[ $DNS_STR =~ ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
-                                   read -p "You chose $DNS_STR, Are you sure? (y =yes)"  CHECK
-                                   if [[ "$CHECK" == "y" ]]; then
-                                        break
-                                   fi
-                              else
-                                   echo "Not a valid IP address, for multiple addresses, separate with comma."
-                              fi
-                         done
-                         #echo "dns=$DNS_STR" >> dns.txt
-                         echo "    nameserver: $DNS_STR" >> interfaces.yaml
+          do
+               read -p 'Enter DNS addresses (for multiple addresses, separate with comma - 8.8.8.8,1.1.1.1):' DNS_STR
+               if [[ $DNS_STR =~ ^((([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)),)*(([1-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-4])\.)(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){2})((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))$ ]]; then
+                    read -p "You chose $DNS_STR, Are you sure? (y =yes)"  CHECK
+                    if [[ "$CHECK" == "y" ]]; then
+                         break
+                     fi
+               else
+                    echo "Not a valid IP address, for multiple addresses, separate with comma."
+               fi
+     done
+          #echo "dns=$DNS_STR" >> dns.txt
+          echo "    nameserver: $DNS_STR" >> interfaces.yaml
 }
 
 
 
 # submenu
 configMenu () {
+  while true; do
   local PS3='Please enter sub option: '
   options=("Config IP" "Configure SNMP" "Configure IP Route" "Configure DNS" "Configure Default Gateway" "Quit")
                select opt in "${options[@]}"
                do
                case $opt in
                     "Config IP")
-                         configureIP
+                         configureIP   
+                         AskForSubnetMask
+                         break
                          ;;
                     "Configure SNMP")
                          editSNMP
+                         break
                          ;;
                     "Configure IP Route")
                          configureNetwork
                          configureGateway
                          echo "  - gw: $DEFAULT_GATEWAY" >> routes.yaml
+                         break
                          ;;
                     "Configure DNS")
                          configureDNS
+                         break
                          ;;
                     "Configure Default Gateway")
                          configureGateway
-                         ;;
-                    "Quit")
                          break
                          ;;
+                    "Quit")
+                         break 2
+                         ;;
                     *) echo invalid option;;
-                    esac
+          esac
      done
+done
 }
 
 selectInterface() {
@@ -186,13 +209,15 @@ selectInterface() {
 	do  
      		echo "Selected interface: $interface"
      		selectedIf=$interface
-		return $selectedIf
+		return ${interface}
      		break 
 	done
 }
 
 displayMenu()
 {
+       while true; do
+
              local PS3='Please enter sub option: '
             options=("Display IP" "Display SNMP" "Display IP Route" "Quit")
                select opt in "${options[@]}"
@@ -201,20 +226,24 @@ displayMenu()
                     
                     "Display IP")
                          ip addr show | grep -v 'forever\|valid\|link\|::\|lo:\|host\|NO' | awk '{print $2}'
+                         break
                          ;;
                     "Display SNMP")
                          grep -v '^#' /etc/snmp/snmpd.conf | grep .
                          grep -v '^#' /etc/snmp/snmp.conf | grep .
+                         break
                          ;;
                     "Display IP Route")
                          netstat -nr 
+                         break
                          ;;
                     "Quit")
-                         break
+                         break 2
                          ;;
                     *) echo invalid option;;
                     esac
                done
+     done
 }
 
 
